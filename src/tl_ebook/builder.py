@@ -18,6 +18,7 @@ class EpubBuilder:
         author: str,
         language: str = "ja",
         identifier: Optional[str] = None,
+        cover_image_bytes: Optional[bytes] = None,
     ):
         self.book = epub.EpubBook()
         self.book.set_title(title)
@@ -28,6 +29,9 @@ class EpubBuilder:
         else:
             self.book.set_identifier(f"tl-ebook-{title.lower().replace(' ', '-')}")
 
+        if cover_image_bytes:
+            self.book.set_cover("cover.jpeg", cover_image_bytes)
+
         self.chapters: List[epub.EpubHtml] = []
         self._add_default_style()
 
@@ -35,7 +39,7 @@ class EpubBuilder:
         style = """
         @charset "UTF-8";
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+            font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
             line-height: 1.85;
             letter-spacing: 0.03em;
             margin: 5%;
@@ -48,6 +52,7 @@ class EpubBuilder:
             padding-bottom: 0.3em;
             margin-top: 1.5em;
             margin-bottom: 1em;
+            page-break-before: always;
         }
         h2 {
             font-size: 1.3em;
@@ -55,6 +60,13 @@ class EpubBuilder:
             margin-top: 1.4em;
             margin-bottom: 0.8em;
             color: #2b2b2b;
+        }
+        h3 {
+            font-size: 1.15em;
+            font-weight: bold;
+            margin-top: 1.2em;
+            margin-bottom: 0.6em;
+            color: #444;
         }
         p {
             margin-top: 0;

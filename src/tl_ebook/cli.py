@@ -100,7 +100,8 @@ def extract(pdf_path: str, output_dir: str):
 )
 @click.option("--title", default="ビジュアル・シンカーの脳：見取り図・パターン・抽象で考える人々", help="EPUB book title.")
 @click.option("--author", default="テンプル・グランディン, ベッツィ・ラーナー", help="Book author.")
-def build(input_dir: str, output_epub: str, title: str, author: str):
+@click.option("--cover", default=None, help="Optional cover image path or source EPUB to extract cover from.")
+def build(input_dir: str, output_epub: str, title: str, author: str, cover: str):
     """Build a Japanese EPUB from translated Markdown files."""
     in_dir = Path(input_dir)
     if not in_dir.exists():
@@ -112,7 +113,21 @@ def build(input_dir: str, output_epub: str, title: str, author: str):
         console.print(f"[yellow]Warning: No markdown files found in {input_dir}[/yellow]")
         return
 
-    builder = EpubBuilder(title=title, author=author)
+    cover_bytes = None
+    if cover:
+        cover_path = Path(cover)
+        if cover_path.exists():
+            if cover_path.suffix.lower() == ".epub":
+                import zipfile
+                with zipfile.ZipFile(cover_path) as z:
+                    for name in z.namelist():
+                        if "cover" in name.lower() and name.endswith((".jpeg", ".jpg", ".png")):
+                            cover_bytes = z.read(name)
+                            break
+            elif cover_path.suffix.lower() in [".jpg", ".jpeg", ".png"]:
+                cover_bytes = cover_path.read_bytes()
+
+    builder = EpubBuilder(title=title, author=author, cover_image_bytes=cover_bytes)
     for md_path in md_files:
         content = md_path.read_text(encoding="utf-8")
         first_line = content.splitlines()[0] if content.splitlines() else md_path.stem

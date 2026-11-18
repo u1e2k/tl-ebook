@@ -28,11 +28,12 @@ work/
 references/*.epub
 references/*.pdf
 
-# Environment & Logs
-.env
-*.log
-.DS_Store
-Thumbs.db
+# Scripts & Temporary scratch files
+scripts/*.py
+scripts/*_dump.txt
+scripts/ch6/
+*.tmp
+*.temp
 
 # IDE & Editor
 .vscode/
