@@ -1,0 +1,40 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Virtual Environments
+.venv/
+env/
+venv/
+ENV/
+
+# Source e-books & intermediate extracted data
+src_en/
+work/
+*.epub
+*.pdf
+*.mobi
+*.azw3
+
+# References / Local custom inputs (except templates)
+# Keep references/glossary.json and style_guide.md tracked if needed, or ignore books
+# We keep references/ tracked as template/guide, but ignore raw book assets
+references/*.epub
+references/*.pdf
+
+# Environment & Logs
+.env
+*.log
+.DS_Store
+Thumbs.db
+
+# IDE & Editor
+.vscode/
+.idea/
+references/style_guide.md
