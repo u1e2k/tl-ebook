@@ -24,13 +24,17 @@ class EpubBuilder:
         self.book.set_title(title)
         self.book.set_language(language)
         self.book.add_author(author)
+        
+        # Ensure identifier uses ASCII only (avoids Kindle parser bugs)
         if identifier:
             self.book.set_identifier(identifier)
         else:
-            self.book.set_identifier(f"tl-ebook-{title.lower().replace(' ', '-')}")
+            self.book.set_identifier("tl-ebook-visual-thinking-ja")
 
+        self.has_cover = False
         if cover_image_bytes:
-            self.book.set_cover("cover.jpeg", cover_image_bytes)
+            self.book.set_cover("cover.jpeg", cover_image_bytes, create_page=True)
+            self.has_cover = True
 
         self.chapters: List[epub.EpubHtml] = []
         self._add_default_style()
@@ -152,5 +156,16 @@ class EpubBuilder:
         self.book.add_item(epub.EpubNcx())
         self.book.add_item(epub.EpubNav())
 
-        self.book.spine = ["nav"] + self.chapters
+        # Construct spine: Ensure cover is first in spine for Kindle thumbnail extraction
+        spine_items = []
+        if self.has_cover:
+            spine_items.append("cover")
+        spine_items.append("nav")
+        spine_items.extend(self.chapters)
+        self.book.spine = spine_items
+
+        # Add EPUB 2 compatible guide element (strictly required by Kindle Send-to-Kindle)
+        if self.has_cover:
+            self.book.guide = [{"type": "cover", "title": "Cover", "href": "cover.xhtml"}]
+
         epub.write_epub(str(out), self.book, {})
